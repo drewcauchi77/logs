@@ -13,7 +13,22 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
     const listRef = useRef<List | null>(null);
-    const ROW_HEIGHT = 57;
+    const [isMobile, setIsMobile] = useState<boolean>(false);
+
+    // Handle window resize and update mobile status
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        // Initial check
+        checkMobile();
+        
+        window.addEventListener('resize', checkMobile);
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: globalThis.MouseEvent): void => {
@@ -60,7 +75,7 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
         if (listRef.current) {
             listRef.current.scrollToItem(0);
         }
-    }, [searchTerm, selectedLevels]);
+    }, [searchTerm, selectedLevels, isMobile]);
 
     const toggleLevel = (level: string): void => {
         if (selectedLevels.includes(level)) {
@@ -154,18 +169,26 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
             </div>
             <div className="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24 md:mt-12">
                 <div className="w-full border-b border-slate-300 bg-slate-50">
-                    <div className="flex w-full text-left">
-                        <div className="p-4 w-[15%]">
+                    <div className="hidden md:flex w-full text-left">
+                        <div className="p-4 w-[20%] lg:w-[15%]">
                             <p>Time (UTC)</p>
                         </div>
-                        <div className="p-4 w-[15%]">
+                        <div className="p-4 w-[15%] lg:w-[15%]">
                             <p>Type</p>
                         </div>
-                        <div className="p-4 w-[40%]">
+                        <div className="p-4 w-[35%] lg:w-[40%]">
                             <p>Message</p>
                         </div>
                         <div className="p-4 w-[30%]">
                             <p>Source</p>
+                        </div>
+                    </div>
+                    <div className="flex md:hidden w-full text-left">
+                        <div className="p-3 w-1/2">
+                            <p>Time (UTC)</p>
+                        </div>
+                        <div className="p-3 w-1/2">
+                            <p>Type</p>
                         </div>
                     </div>
                 </div>
@@ -178,7 +201,7 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
                                     ref={listRef}
                                     height={height}
                                     itemCount={filteredLogs.length}
-                                    itemSize={ROW_HEIGHT}
+                                    itemSize={isMobile ? 120 : 57}
                                     width={width}
                                     className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
                                     overscanCount={5}
