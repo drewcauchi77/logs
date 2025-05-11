@@ -62,7 +62,7 @@ const LogsList = ({ logs }: LogsListProps) => {
 
     return (
         <>
-            <div className="mb-4 flex flex-col md:flex-row md:items-start gap-4">
+            <div className="mb-4 flex flex-col md:flex-row md:items-start gap-4 fixed top-0 z-10 w-full left-0 py-5 px-8 bg-white">
                 <div className="relative flex-grow">
                     <input type="text"
                         className="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"
@@ -124,7 +124,7 @@ const LogsList = ({ logs }: LogsListProps) => {
                     )}
                 </div>
             </div>
-            <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
+            <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24">
                 <table className="w-full text-left table-auto min-w-max">
                     <thead>
                         <tr>
