@@ -20,3 +20,8 @@ export interface LevelColor {
     textColor: string;
     borderColor: string;
 };
+
+export interface AutoSizerProps {
+    height: number;
+    width: number;
+};

@@ -1,7 +1,9 @@
 "use client"
 import { useMemo, useState, useRef, useEffect, MouseEvent as ReactMouseEvent } from "react";
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 import LogRow from "./LogRow";
-import { type LogEntry, LogsListProps } from "@/app/types/definitions";
+import { AutoSizerProps, type LogEntry, LogsListProps } from "@/app/types/definitions";
 import { dateInUtc, capitaliseText, getColorsByLevel } from "@/app/helpers/helpers";
 
 const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
@@ -10,6 +12,8 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
+    const listRef = useRef<List | null>(null);
+    const ROW_HEIGHT = 57;
 
     useEffect(() => {
         const handleClickOutside = (event: globalThis.MouseEvent): void => {
@@ -52,12 +56,28 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
         })
     }, [parsedLogs, searchTerm, selectedLevels]);
 
+    useEffect(() => {
+        if (listRef.current) {
+            listRef.current.scrollToItem(0);
+        }
+    }, [searchTerm, selectedLevels]);
+
     const toggleLevel = (level: string): void => {
         if (selectedLevels.includes(level)) {
             setSelectedLevels(selectedLevels.filter((l: string) => l !== level));
         } else {
             setSelectedLevels([...selectedLevels, level]);
         }
+    };
+
+    const VirtualRow = ({ index, style }: { index: number, style: React.CSSProperties }) => {
+        const log = filteredLogs[index];
+
+        return (
+            <div style={style}>
+                <LogRow log={log} searchTerm={searchTerm} />
+            </div>
+        );
     };
 
     return (
@@ -132,30 +152,47 @@ const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
                     )}
                 </div>
             </div>
-            <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24 md:mt-12">
-                <table className="w-full text-left table-auto min-w-max">
-                    <thead>
-                        <tr>
-                            <th className="p-4 border-b border-slate-300 bg-slate-50">
-                                <p>Time (UTC)</p>
-                            </th>
-                            <th className="p-4 border-b border-slate-300 bg-slate-50">
-                                <p>Type</p>
-                            </th>
-                            <th className="p-4 border-b border-slate-300 bg-slate-50">
-                                <p>Message</p>
-                            </th>
-                            <th className="p-4 border-b border-slate-300 bg-slate-50">
-                                <p>Source</p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredLogs.map((entry: LogEntry) => (
-                            <LogRow log={entry} key={entry.id} searchTerm={searchTerm} />
-                        ))}
-                    </tbody>
-                </table>
+            <div className="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24 md:mt-12">
+                <div className="w-full border-b border-slate-300 bg-slate-50">
+                    <div className="flex w-full text-left">
+                        <div className="p-4 w-[15%]">
+                            <p>Time (UTC)</p>
+                        </div>
+                        <div className="p-4 w-[15%]">
+                            <p>Type</p>
+                        </div>
+                        <div className="p-4 w-[40%]">
+                            <p>Message</p>
+                        </div>
+                        <div className="p-4 w-[30%]">
+                            <p>Source</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="flex-grow" style={{ height: 'calc(100vh - 220px)' }}>
+                    {filteredLogs.length > 0 ? (
+                        <AutoSizer>
+                            {({ height, width }: AutoSizerProps) => (
+                                <List
+                                    ref={listRef}
+                                    height={height}
+                                    itemCount={filteredLogs.length}
+                                    itemSize={ROW_HEIGHT}
+                                    width={width}
+                                    className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+                                    overscanCount={5}
+                                >
+                                    {VirtualRow}
+                                </List>
+                            )}
+                        </AutoSizer>
+                    ) : (
+                        <div className="flex items-center justify-center h-full p-6 text-slate-500">
+                            No logs matching your filter criteria
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     );
