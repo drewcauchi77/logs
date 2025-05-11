@@ -1,18 +1,18 @@
 "use client"
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect, MouseEvent as ReactMouseEvent } from "react";
 import LogRow from "./LogRow";
 import { type LogEntry, LogsListProps } from "@/app/types/definitions";
 import { dateInUtc, capitaliseText, getColorsByLevel } from "@/app/helpers/helpers";
 
-const LogsList = ({ logs }: LogsListProps) => {
+const LogsList: React.FC<LogsListProps> = ({ logs }: LogsListProps) => {
     const [levels, setLevels] = useState<string[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: globalThis.MouseEvent): void => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setDropdownOpen(false);
             }
@@ -26,35 +26,35 @@ const LogsList = ({ logs }: LogsListProps) => {
 
     const parsedLogs: LogEntry[] = useMemo(
         () => 
-            logs.map((entry) => {
+            logs.map((entry: string) => {
                 const [ts, msg, level, source, id] = entry.split("|=|");
 
-                const date = new Date(ts);
-                const dateTime = dateInUtc(date);
+                const date: Date = new Date(ts);
+                const dateTime: string = dateInUtc(date);
 
                 if (!levels.includes(level.toLowerCase())) {
                     setLevels([...levels, level.toLowerCase()]);
                 }
 
                 return { dateTime, msg, level, source, id };
-            }).sort((a, b) => Date.parse(b.dateTime) - Date.parse(a.dateTime)),
+            }).sort((a: LogEntry, b: LogEntry) => Date.parse(b.dateTime) - Date.parse(a.dateTime)),
         [logs, levels]
     );
 
     const filteredLogs: LogEntry[] = useMemo(() => {
-        const term = searchTerm.toLowerCase();
+        const term: string = searchTerm.toLowerCase();
 
-        return parsedLogs.filter((log) => {
-            const textMatch = log.msg.toLowerCase().includes(term) || log.source.toLowerCase().includes(term);
-            const levelMatch = selectedLevels.length === 0 || selectedLevels.includes(log.level.toLowerCase());
+        return parsedLogs.filter((log: LogEntry) => {
+            const textMatch: boolean = log.msg.toLowerCase().includes(term) || log.source.toLowerCase().includes(term);
+            const levelMatch: boolean = selectedLevels.length === 0 || selectedLevels.includes(log.level.toLowerCase());
 
             return textMatch && levelMatch;
         })
     }, [parsedLogs, searchTerm, selectedLevels]);
 
-    const toggleLevel = (level: string) => {
+    const toggleLevel = (level: string): void => {
         if (selectedLevels.includes(level)) {
-            setSelectedLevels(selectedLevels.filter(l => l !== level));
+            setSelectedLevels(selectedLevels.filter((l: string) => l !== level));
         } else {
             setSelectedLevels([...selectedLevels, level]);
         }
@@ -64,11 +64,16 @@ const LogsList = ({ logs }: LogsListProps) => {
         <>
             <div className="mb-4 flex flex-col md:flex-row md:items-start gap-4 fixed top-0 z-10 w-full left-0 py-5 px-8 bg-white">
                 <div className="relative flex-grow">
-                    <input type="text"
+                    <input 
+                        type="text"
                         className="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"
-                        placeholder="Search logs..." onChange={(e) => setSearchTerm(e?.target?.value ?? '')}
+                        placeholder="Search logs..." 
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e?.target?.value ?? '')}
                     />
-                    <button className="absolute h-8 w-8 right-1 top-1 my-auto px-2 flex items-center bg-white rounded" type="button">
+                    <button 
+                        className="absolute h-8 w-8 right-1 top-1 my-auto px-2 flex items-center bg-white rounded" 
+                        type="button"
+                    >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-8 h-8 text-slate-600">
                             <path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
@@ -81,12 +86,15 @@ const LogsList = ({ logs }: LogsListProps) => {
                             <span className="text-slate-400">Select Type(s)</span>
                         ) : (
                             <>
-                                {selectedLevels.map((level) => (
-                                    <div key={level} className={`flex items-center px-2 rounded-full border ${getColorsByLevel(level).backgroundColor} ${getColorsByLevel(level).borderColor} ${getColorsByLevel(level).textColor}`}
-                                        onClick={(e) => {
+                                {selectedLevels.map((level: string) => (
+                                    <div 
+                                        key={level} 
+                                        className={`flex items-center px-2 rounded-full border ${getColorsByLevel(level).backgroundColor} ${getColorsByLevel(level).borderColor} ${getColorsByLevel(level).textColor}`}
+                                        onClick={(e: ReactMouseEvent) => {
                                             e.stopPropagation();
                                             toggleLevel(level);
-                                        }}>
+                                        }}
+                                    >
                                         <span className="mr-1">{capitaliseText(level)}</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -102,7 +110,7 @@ const LogsList = ({ logs }: LogsListProps) => {
                     
                     {dropdownOpen && (
                         <div className="absolute w-full mt-1 bg-white border border-slate-200 rounded shadow-md z-10 max-h-[200px] overflow-y-auto">
-                            {levels.map((level) => (
+                            {levels.map((level: string) => (
                                 <div 
                                     key={level}
                                     className={`px-3 py-2 cursor-pointer hover:bg-slate-100 ${selectedLevels.includes(level) ? 'bg-slate-50' : ''}`}
@@ -124,7 +132,7 @@ const LogsList = ({ logs }: LogsListProps) => {
                     )}
                 </div>
             </div>
-            <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24">
+            <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border mt-24 md:mt-12">
                 <table className="w-full text-left table-auto min-w-max">
                     <thead>
                         <tr>
@@ -143,16 +151,14 @@ const LogsList = ({ logs }: LogsListProps) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredLogs.map((entry) => {
-                            return (
-                                <LogRow log={entry} key={entry.id} searchTerm={searchTerm}></LogRow>
-                            );
-                        })}
+                        {filteredLogs.map((entry: LogEntry) => (
+                            <LogRow log={entry} key={entry.id} searchTerm={searchTerm} />
+                        ))}
                     </tbody>
                 </table>
             </div>
         </>
-    )
+    );
 };
 
 export default LogsList;

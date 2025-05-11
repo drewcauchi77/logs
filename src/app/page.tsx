@@ -1,9 +1,16 @@
+import { NextPage } from 'next';
 import LogsList from '@/app/components/client/LogsList';
 
 type Log = string;
 
-const Home = async () => {
-    const res = await fetch('https://challenges.betterstudio.io/logs', {
+interface FetchResponse {
+    ok: boolean;
+    status: number;
+    json: () => Promise<Log[]>;
+}
+
+const Home: NextPage = async () => {
+    const res: FetchResponse = await fetch('https://challenges.betterstudio.io/logs', {
         method: 'GET',
         headers: {
             'x-log-key': process.env.API_KEY!,
@@ -19,7 +26,7 @@ const Home = async () => {
 
     return (
         <main className="p-8 min-h-screen">
-            <LogsList logs={logs}></LogsList>
+            <LogsList logs={logs} />
         </main>
     );
 }

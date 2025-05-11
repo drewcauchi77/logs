@@ -1,15 +1,16 @@
 "use client";
-import { LogRowProps } from "@/app/types/definitions";
+import React from "react";
+import { LogRowProps, LevelColor, LogEntry } from "@/app/types/definitions";
 import { useHighlightedText } from "@/app/hooks/useHighlightedText";
 import { capitaliseText } from "@/app/helpers/helpers";
 import { useLevelColour } from "@/app/hooks/useLevelColour";
 
-const LogRow = ({ log, searchTerm }: LogRowProps) => {
-    const { dateTime, level, msg, source } = log;
+const LogRow: React.FC<LogRowProps> = ({ log, searchTerm = '' }: LogRowProps) => {
+    const { dateTime, level, msg, source }: LogEntry = log;
 
-    const levelColour = useLevelColour(level);
-    const highlightedMsg = useHighlightedText(msg, searchTerm);
-    const highlightedSource = useHighlightedText(source, searchTerm);
+    const levelColour: LevelColor = useLevelColour(level);
+    const highlightedMsg: string = useHighlightedText(msg, searchTerm);
+    const highlightedSource: string = useHighlightedText(source, searchTerm);
 
     return (
         <tr className="hover:bg-slate-50">
@@ -23,10 +24,16 @@ const LogRow = ({ log, searchTerm }: LogRowProps) => {
                 </p>
             </td>
             <td className="p-4 border-b border-slate-200">
-                <p className="block text-sm text-slate-800" dangerouslySetInnerHTML={{ __html: highlightedMsg }}></p>
+                <p 
+                    className="block text-sm text-slate-800" 
+                    dangerouslySetInnerHTML={{ __html: highlightedMsg }}
+                />
             </td>
             <td className="p-4 border-b border-slate-200">
-                <p className="block text-sm text-slate-800" dangerouslySetInnerHTML={{ __html: highlightedSource }}></p>
+                <p 
+                    className="block text-sm text-slate-800" 
+                    dangerouslySetInnerHTML={{ __html: highlightedSource }}
+                />
             </td>
         </tr>
     );
