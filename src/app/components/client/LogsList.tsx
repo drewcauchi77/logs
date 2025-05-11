@@ -39,8 +39,8 @@ const LogsList = ({ logs }: LogsListProps) => {
 
     return (
         <>
-            <div className="mb-4">
-                <div className="relative">
+            <div className="mb-4 flex flex-col md:flex-row md:items-start gap-4">
+                <div className="relative flex-grow">
                     <input type="text"
                         className="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"
                         placeholder="Search logs..." onChange={(e) => setSearchTerm(e?.target?.value ?? '')}
@@ -51,22 +51,28 @@ const LogsList = ({ logs }: LogsListProps) => {
                         </svg>
                     </button>
                 </div>
-                <select multiple value={selectedLevels}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                        const values = Array.from(
-                            e.target.selectedOptions,
-                            (opt) => opt.value
-                        );
+                <div className="w-full md:w-1/3 lg:w-1/4">
+                    <div className="relative">
+                        <select multiple value={selectedLevels}
+                            className="bg-white w-full min-h-[100px] pl-3 py-2 text-slate-700 text-sm border border-slate-200 rounded transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md"
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                const values = Array.from(
+                                    e.target.selectedOptions,
+                                    (opt) => opt.value
+                                );
 
-                        setSelectedLevels(values);
-                    }}>
-                    <option disabled value="">Select Level:</option>
-                    {levels.map((level, index) => {
-                        return (
-                            <option key={index} value={level.toLowerCase()}>{capitaliseText(level)}</option>
-                        )
-                    })}
-                </select>
+                                setSelectedLevels(values);
+                            }}>
+                            <option disabled value="" className="text-slate-400">Select Type(s):</option>
+                            {levels.map((level, index) => {
+                                return (
+                                    <option key={index} value={level.toLowerCase()} className="p-1">{capitaliseText(level)}</option>
+                                )
+                            })}
+                        </select>
+                        <div className="text-xs text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</div>
+                    </div>
+                </div>
             </div>
             <div className="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
                 <table className="w-full text-left table-auto min-w-max">
