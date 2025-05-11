@@ -13,4 +13,10 @@ export interface LogsListProps {
 export interface LogRowProps {
     log: LogEntry;
     searchTerm: string;
-}
+};
+
+export interface LevelColor {
+    backgroundColor: string;
+    textColor: string;
+    borderColor: string;
+};

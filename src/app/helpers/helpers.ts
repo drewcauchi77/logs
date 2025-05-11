@@ -1,3 +1,6 @@
+import { LevelColor } from "../types/definitions";
+import colorData from "@/app/data/colors.json";
+
 export const dateInUtc = (date: Date): string => {
     const dd = String(date.getUTCDate()).padStart(2, "0");
     const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -10,4 +13,9 @@ export const dateInUtc = (date: Date): string => {
 
 export const capitaliseText = (value: string): string => {
     return String(value).charAt(0).toUpperCase() + String(value).slice(1).toLowerCase()
+};
+
+export const getColorsByLevel = (level: string): LevelColor => {
+    const lookup = (colorData as Record<string, LevelColor>)[level.toLowerCase()];
+    return lookup ?? colorData.default;
 };

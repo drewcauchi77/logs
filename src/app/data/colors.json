@@ -1,0 +1,27 @@
+{
+    "error": {
+        "backgroundColor": "bg-red-100",
+        "textColor": "text-red-700",
+        "borderColor": "border-red-200"
+    },
+    "warn": {
+        "backgroundColor": "bg-yellow-100",
+        "textColor": "text-yellow-700",
+        "borderColor": "border-yellow-200"
+    },
+    "info": {
+        "backgroundColor": "bg-blue-100",
+        "textColor": "text-blue-700",
+        "borderColor": "border-blue-200"
+    },
+    "debug": {
+        "backgroundColor": "bg-purple-100",
+        "textColor": "text-purple-700",
+        "borderColor": "border-purple-200"
+    },
+    "default": {
+        "backgroundColor": "bg-slate-100",
+        "textColor": "text-slate-700",
+        "borderColor": "border-slate-200"
+    }
+}
